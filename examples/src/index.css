@@ -1,0 +1,21 @@
+body{
+    margin: 0
+}
+
+/* .main{
+    display: flex;
+    justify-content: space-around;
+} */
+
+/* .circ{
+    margin-top: 600px;
+    margin-left: 1200px;
+} */
+
+.child{
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-right: 20px;
+    font-size: 18px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
