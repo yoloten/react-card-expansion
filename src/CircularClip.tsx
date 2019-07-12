@@ -3,22 +3,25 @@ import styled from "styled-components"
 import * as React from "react"
 
 namespace Style {
-    export const cardTop = ({ fullScreen, click, y }: Circular.State) => fullScreen === 0 || click === 0 ? "" : `${-y}`
-    export const left = ({ fullScreen, click, x }: Circular.State) => fullScreen === 0 || click === 0 ? "" : `${-x}`
-    export const zIndex = ({ fullScreen, click }: Circular.State) => fullScreen === 0 || click === 0 ? "0" : "100"
-    export const contentDisplay = ({ fullScreen, click }: Circular.State) => fullScreen === 0 ? "none" : "block"
-    export const contentHeight = ({ fullScreen, click }: Circular.State) => {
-        return fullScreen === 0 || click === 0 ? "0" : "50vh"
+    export const cardTop = ({ fullScreen, click, y }: Circular.State) => {
+        return fullScreen === 0 || click === 0 ? "" : `${-y * 2}`
     }
-    export const contentWidth = ({ fullScreen, click }: Circular.State) => {
-        return fullScreen === 0 || click === 0 ? "0" : "100vw"
-    } 
+    export const left = ({ fullScreen, click, x }: Circular.State) => fullScreen === 0 || click === 0 ? "0" : `${-x}`
+    export const zIndex = ({ fullScreen, click }: Circular.State) => fullScreen === 0 || click === 0 ? "0" : "100"
+    export const display = ({ fullScreen, click }: Circular.State) => fullScreen === 0 ? "none" : ""
+    export const heightContent = ({ fullScreen, click, children }: Circular.State) => {
+        const windowHeight = window.innerHeight
+        //console.log(windowHeight / 2, contentHeight)
+        if (fullScreen === 0 || click === 0) { return "0" }
+        if ( children && children.length !== 0 ) { return ""}
+        return "60vh"
+    }
     export const cardHeight = ({ fullScreen, click }: Circular.State) => {
-        return fullScreen === 0 || click === 0 ? "200px" : "50vh"
+        return fullScreen === 0 || click === 0 ? "200px" : "500px"
     } 
     export const bgImage = ({ headerImage }: Circular.Props) => headerImage
     export const cardWidth = ({ fullScreen, click }: Circular.State) => {
-        return fullScreen === 0 || click === 0 ? "200px" : "100vw"
+        return fullScreen === 0 || click === 0 ? "200px" : "99.4vw"
     } 
     export const contentBgColor = ({ contentColor }: Circular.Props) => contentColor
 }
@@ -36,35 +39,38 @@ namespace Circular {
         width: string
     }
     export interface State {
+        contentHeight: number
         fullScreen: number
         click: number
         x: number
         y: number
     }
 }
+// height:  ${Style.contentHeight};
 
 const Card = styled.div`
-    background-image: url(${ Style.bgImage });
+    background: url(${ Style.bgImage }) no-repeat center center;
     background-repeat: no-repeat;
     background-size: cover;
     height:  ${Style.cardHeight};
     width: ${Style.cardWidth};
     top: ${Style.cardTop};
     left: ${Style.left};
-    position: fixed;
+    position: absolute;
 `
 const Content = styled.div`
     background: ${Style.contentBgColor};
-    display: ${Style.contentDisplay};
-    height:  ${Style.contentHeight};
-    width: ${Style.contentWidth};
+    display: ${Style.display};
+    width: 99.4vw;
+    height:  ${Style.heightContent};
+    top: 0;
     left: ${Style.left};
-    position: fixed;
-    bottom: 0;
+    position: absolute;
 `
 const Main = styled.div`
     z-index: ${Style.zIndex};
-    position:  absolute;
+    position: absolute;
+    left: ${Style.left};
 `
 export class CircularClip extends React.Component<Circular.Props, Circular.State> {
     private Circular: any
@@ -79,16 +85,18 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     }
 
     public state: Circular.State = {
+        contentHeight: 0,
         fullScreen: 0,
         click: 0,
         x: 0,
-        y: 0
+        y: 0,
     }
 
     public componentDidMount() {
+        //console.log(this.props.children[0])
         this.setState({
             x: this.Main.getBoundingClientRect().left, 
-            y: this.Main.getBoundingClientRect().top
+            y: this.Main.getBoundingClientRect().top,
         })
     }
 
@@ -98,12 +106,12 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const circular = styler(card)
         const animateContent = styler(content)
         const { click, x, y} = this.state
-        //const ballXY = value({ x: 0, y: 0 }, circular.set)
         const windowWidth = window.innerWidth
         const windowHeight = window.innerHeight
         const translateToY = windowHeight / 8 - y
         const translateToX = windowWidth / 2.2 - x
-        console.log(y)
+        const contentY = 500 - y//windowHeight  * 0.45 - y 
+        console.log(contentY, y)
         const initialY = () => {
             return y !== 0 ? 0 : y 
         }
@@ -139,7 +147,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                         y: translateToY,
                         x: translateToX,
                     },
-                    duration: 900
+                    duration: 1500
                 }),
             )
             .start(circular.set)
@@ -148,35 +156,35 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 tween({
                     from : { 
                         borderRadius: 900,
-                        scaleX: 0.4
-                        y: y,
-                        x: x, 
+                        y,
+                        x,
                     },
                     to: {
                         borderRadius: 0,
-                        scaleX: 1
-                        y: y,
-                        x: x,
+                        scaleX: 1,
+                        y,
+                        x,
                     },
-                    duration: 200
+                    duration: 300
                 })
                     .start(circular.set)
                 tween({
                     from: {
                         scaleY: 0.1,
-                        y: 200,
-                        x: x,  
+                        y: contentY * 2,
+                        x,  
                     },
                     to: {
                         scaleY: 1,
-                        y: 0,
-                        x: x,
-                    }
+                        y: contentY,
+                        x,
+                    },
+                    duration: 1000
                 })
                     .start(animateContent.set)
 
                 this.setState({ fullScreen: 1, click: 1 })
-            }, 1700)
+            }, 2000)
 
         } else {
             tween({
@@ -199,18 +207,18 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             tween({
                 from: {
                     scaleY: 1,
-                    y: 300,
-                    x: x,
+                    y: contentY,
+                    x: 0,
                 },
                 to: {
                     scaleY: 0,
-                    y: 300,
-                    x: x,
+                    y: contentY * 2,
+                    x: 0,
                 },
-                duration: 500
+                duration: 1000
             })
             .start(animateContent.set)
-
+            
             setTimeout(() => {
                 chain(
                     tween({
@@ -227,7 +235,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                             scale: 0.6
                         },
                         duration: 1500
-                    })
+                    }),
                     tween({
                         from: {
                             borderRadius: 730, 
@@ -247,19 +255,19 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     }
 
     public render() {
-        // console.log(this.state.fullScreen)
-        
-        return (
+         //console.log(this.state.contentHeight)
+         return (
             <Main 
-                ref={(node) => this.Main = node}
+                ref={(node: any) => this.Main = node}
                 click={this.state.click} 
                 className={this.props.className}
                 fullScreen={this.state.fullScreen}
+                x={this.state.x}
             >
                 <Card
                     click={this.state.click}
                     fullScreen={this.state.fullScreen}
-                    ref={(node) => this.Circular = node}
+                    ref={(node: any) => this.Circular = node}
                     onClick={this.onStart}
                     y={this.state.y}
                     x={this.state.x}
@@ -269,10 +277,12 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 <Content
                     contentColor={this.props.contentColor}
                     fullScreen={this.state.fullScreen}
-                    ref={(node) => this.Content = node}
+                    ref={(node: any) => this.Content = node}
                     x={this.state.x}
+                    y={this.state.y}
+                    contentHeight={this.state.contentHeight}
                     >
-                    {Array.isArray(this.props.children) ? this.props.children.map( i => i) : this.props.children}
+                    {Array.isArray(this.props.children) ? this.props.children.map( (i) => i) : this.props.children}
                 </Content>
             </Main >
         )
