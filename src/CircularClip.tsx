@@ -1,29 +1,28 @@
-import { tween, styler, chain } from "popmotion"
+import { tween, styler, chain, delay } from "popmotion"
 import styled from "styled-components"
 import * as React from "react"
+import { easeInOut } from "@popmotion/easing"
 
 namespace Style {
-    export const cardTop = ({ fullScreen, click, y }: Circular.State) => {
-        return fullScreen === 0 || click === 0 ? "" : `${-y * 2}`
-    }
     export const left = ({ fullScreen, click, x }: Circular.State) => fullScreen === 0 || click === 0 ? "0" : `${-x}`
     export const zIndex = ({ fullScreen, click }: Circular.State) => fullScreen === 0 || click === 0 ? "0" : "100"
-    export const display = ({ fullScreen, click }: Circular.State) => fullScreen === 0 ? "none" : ""
-    export const heightContent = ({ fullScreen, click, children }: Circular.State) => {
-        const windowHeight = window.innerHeight
-        //console.log(windowHeight / 2, contentHeight)
-        if (fullScreen === 0 || click === 0) { return "0" }
+    export const display = ({ contentHeight }: Circular.State) => contentHeight === 0 ? "none" : ""
+    export const heightContent = ({ contentHeight, children }: Circular.State) => {
+        if (contentHeight === 0) { return "0" }
         if ( children && children.length !== 0 ) { return ""}
         return "60vh"
     }
-    export const cardHeight = ({ fullScreen, click }: Circular.State) => {
-        return fullScreen === 0 || click === 0 ? "200px" : "500px"
+    export const cardHeight = ({ fullScreen, click, height }: Circular.State) => {
+        return fullScreen === 0 || click === 0 ? height : "500px"
     } 
     export const bgImage = ({ headerImage }: Circular.Props) => headerImage
-    export const cardWidth = ({ fullScreen, click }: Circular.State) => {
-        return fullScreen === 0 || click === 0 ? "200px" : "99.4vw"
+    export const cardWidth = ({ fullScreen, click, width }: Circular.State) => {
+        return fullScreen === 0 || click === 0 ? width : "99.4vw"
     } 
     export const contentBgColor = ({ contentColor }: Circular.Props) => contentColor
+    export const cardTop = ({ fullScreen, click, y }: Circular.State) => {
+        return fullScreen === 0 || click === 0 ? "" : `${-y * 2}`
+    }
 }
 
 namespace Circular {  
@@ -60,12 +59,12 @@ const Card = styled.div`
 `
 const Content = styled.div`
     background: ${Style.contentBgColor};
-    display: ${Style.display};
-    width: 99.4vw;
     height:  ${Style.heightContent};
-    top: 0;
+    display: ${Style.display};
     left: ${Style.left};
     position: absolute;
+    width: 99.4vw;
+    top: 0;
 `
 const Main = styled.div`
     z-index: ${Style.zIndex};
@@ -122,32 +121,37 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             chain(
                 tween({
                     from: {
-                        borderRadius: 120,
+                        height: this.props.width,
+                        borderRadius: 200,
                         y: initialY(),
                         x: initialX(),
                         scale: 1,
                     },
                     to: {
-                        borderRadius: 120,
+                        height: this.props.width,
+                        borderRadius: 200,
                         y: initialY(),
                         x: initialX(),
-                        scale: 0.4,
+                        scale: 0.3,
                     },
-                    duration: 600
+                    duration: 300
                 }),
                 tween({
                     from: {
-                        borderRadius: 120,
+                        height: this.props.width,
+                        borderRadius: 200,
                         y: initialY(),
                         x: initialX(),
-                        scale: 0.4,
-                    },
+                        scale: 0.3, 
+                    }, 
                     to: {
-                        borderRadius: 120,
+                        height: this.props.width,
+                        borderRadius: 200,
                         y: translateToY,
                         x: translateToX,
                     },
-                    duration: 1500
+                    duration: 1500,
+                    ease: easeInOut
                 }),
             )
             .start(circular.set)
@@ -156,131 +160,150 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 tween({
                     from : { 
                         borderRadius: 900,
+                        height: "500px",
                         y,
                         x,
+                        scaleX: 0.7,
                     },
                     to: {
                         borderRadius: 0,
+                        height: "500px",
                         scaleX: 1,
                         y,
                         x,
                     },
-                    duration: 300
+                    duration: 400,
                 })
                     .start(circular.set)
+
+                this.setState({ fullScreen: 1, click: 1 })
+            }, 1900)
+
+            setTimeout(() => {
                 tween({
                     from: {
-                        scaleY: 0.1,
                         y: contentY * 2,
+                        scaleY: 0.1,
                         x,  
                     },
                     to: {
-                        scaleY: 1,
                         y: contentY,
+                        scaleY: 1,
                         x,
                     },
-                    duration: 1000
+                    duration: 300,
                 })
                     .start(animateContent.set)
 
-                this.setState({ fullScreen: 1, click: 1 })
-            }, 2000)
-
+                this.setState({ contentHeight: 1 })
+            }, 2300)
         } else {
+            
             tween({
                 from: {
-                    borderRadius: 120,
-                    y: translateToY,
-                    x: translateToX,
-                    scale: 2,
-                },
-                to: {
-                    borderRadius: 120,
-                    y: translateToY,
-                    x: translateToX,
-                    scale: .4,
-                },
-                duration: 800
-            })
-            .start(circular.set)
-
-            tween({
-                from: {
-                    scaleY: 1,
                     y: contentY,
+                    scaleY: 1,
                     x: 0,
                 },
                 to: {
-                    scaleY: 0,
                     y: contentY * 2,
+                    scaleY: 0,
                     x: 0,
                 },
-                duration: 1000
+                duration: 400
             })
             .start(animateContent.set)
             
             setTimeout(() => {
-                chain(
-                    tween({
-                        from: {
-                            borderRadius: 120,
-                            y: translateToY,
-                            x: translateToX,
-                            scale: .4,
-                        },
-                        to: {
-                            borderRadius: 120,
-                            y: initialY(),
-                            x: initialX(),
-                            scale: 0.6
-                        },
-                        duration: 1500
-                    }),
-                    tween({
-                        from: {
-                            borderRadius: 730, 
-                            scale: 0.6
-                        },
-                        to: {
-                            borderRadius: 0, 
-                            scale: 1
-                        },
-                        duration: 800
-                    })
-                )
+                tween({
+                    from: {
+                        height: this.props.width,
+                        borderRadius: 200,
+                        y: translateToY,
+                        x: translateToX,
+                        scale: 2.3,
+                    },
+                    to: {
+                        height: this.props.width,
+                        borderRadius: 200,
+                        y: translateToY,
+                        x: translateToX,
+                        scale: .3,
+                    },
+                    duration: 900
+                })
                 .start(circular.set)
-            }, 800)
-            this.setState({ fullScreen: 1, click: 0 })
+
+                setTimeout(() => {
+                    chain(
+                        tween({
+                            from: {
+                                height: this.props.width,
+                                borderRadius: 200,
+                                y: translateToY,
+                                x: translateToX,
+                                scale: .3,
+                            },
+                            to: {
+                                height: this.props.width,
+                                borderRadius: 200,
+                                y: initialY(),
+                                x: initialX(),
+                                scale: 0.6
+                            },
+                            duration: 1500
+                        }),
+                        tween({
+                            from: {
+                                height: this.props.width,
+                                borderRadius: 200, 
+                                scale: 0.6
+                            },
+                            to: {
+                                height: this.props.height,
+                                borderRadius: 0, 
+                                scale: 1,
+                            },
+                            duration: 800
+                        }),
+                    )
+                    .start(circular.set)
+                }, 800)
+                
+                this.setState({ fullScreen: 1, click: 0 })
+            }, 300)
+            
         }
     }
 
     public render() {
-         //console.log(this.state.contentHeight)
          return (
             <Main 
                 ref={(node: any) => this.Main = node}
-                click={this.state.click} 
-                className={this.props.className}
                 fullScreen={this.state.fullScreen}
+                className={this.props.className}
+                click={this.state.click} 
                 x={this.state.x}
             >
                 <Card
-                    click={this.state.click}
-                    fullScreen={this.state.fullScreen}
                     ref={(node: any) => this.Circular = node}
+                    headerImage={this.props.headerImage}
+                    fullScreen={this.state.fullScreen}
+                    height={this.props.height}
+                    width={this.props.width}
+                    click={this.state.click}
                     onClick={this.onStart}
                     y={this.state.y}
-                    x={this.state.x}
-                    headerImage={this.props.headerImage}
+                    x={this.state.x} 
                 />
 
                 <Content
+                    ref={(node: any) => this.Content = node}
+                    contentHeight={this.state.contentHeight}
                     contentColor={this.props.contentColor}
                     fullScreen={this.state.fullScreen}
-                    ref={(node: any) => this.Content = node}
                     x={this.state.x}
                     y={this.state.y}
-                    contentHeight={this.state.contentHeight}
                     >
                     {Array.isArray(this.props.children) ? this.props.children.map( (i) => i) : this.props.children}
                 </Content>

@@ -11,6 +11,8 @@ export default class App extends Component {
                     className="circ"
                     headerImage="http://i.imgur.com/J5wR1pO.jpg"
                     contentColor="#2a2b2b"
+                    width="250px"
+                    height="250px"
                 >
                     <h1>React Card Expansion</h1>
                     <div className="child">
