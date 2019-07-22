@@ -110,7 +110,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const translateToY = windowHeight / 8 - y
         const translateToX = windowWidth / 2.2 - x
         const contentY = 500 - y//windowHeight  * 0.45 - y 
-        //console.log(contentY, y)
+        console.log(windowWidth)
         const initialY = () => {
             return y !== 0 ? 0 : y 
         }
@@ -170,7 +170,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     to: {
                         borderRadius: 0,
                         height: "500px",
-                        width: windowWidth + "px",
+                        width: (windowWidth * 0.994) + "px",
                         scaleX: 1,
                         y,
                         x,
