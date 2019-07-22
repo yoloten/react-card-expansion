@@ -1,4 +1,4 @@
-import { tween, styler, chain, delay } from "popmotion"
+import { tween, styler, chain, stagger } from "popmotion"
 import styled from "styled-components"
 import * as React from "react"
 import { easeInOut } from "@popmotion/easing"
@@ -110,7 +110,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const translateToY = windowHeight / 8 - y
         const translateToX = windowWidth / 2.2 - x
         const contentY = 500 - y//windowHeight  * 0.45 - y 
-        console.log(contentY, y)
+        //console.log(contentY, y)
         const initialY = () => {
             return y !== 0 ? 0 : y 
         }
@@ -132,7 +132,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                         borderRadius: 200,
                         y: initialY(),
                         x: initialX(),
-                        scale: 0.3,
+                        scale: 0.4,
                     },
                     duration: 300
                 }),
@@ -142,13 +142,14 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                         borderRadius: 200,
                         y: initialY(),
                         x: initialX(),
-                        scale: 0.3, 
+                        scale: 0.4, 
                     }, 
                     to: {
                         height: this.props.width,
                         borderRadius: 200,
                         y: translateToY,
                         x: translateToX,
+                        scale: 0.3, 
                     },
                     duration: 1500,
                     ease: easeInOut
@@ -159,20 +160,22 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             setTimeout(() => {
                 tween({
                     from : { 
-                        borderRadius: 900,
-                        height: "500px",
-                        y,
-                        x,
-                        scaleX: 0.7,
+                        borderRadius: 400,
+                        height: this.props.width,
+                        width: this.props.width,
+                        y: translateToY + y,
+                        x: translateToX + x,
+                        scale: 0.3, 
                     },
                     to: {
                         borderRadius: 0,
                         height: "500px",
+                        width: windowWidth + "px",
                         scaleX: 1,
                         y,
                         x,
                     },
-                    duration: 400,
+                    duration: 550,
                 })
                     .start(circular.set)
 
@@ -217,20 +220,23 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             setTimeout(() => {
                 tween({
                     from: {
-                        height: this.props.width,
-                        borderRadius: 200,
-                        y: translateToY,
-                        x: translateToX,
-                        scale: 2.3,
+                        height: "500px",
+                        width: windowWidth + "px",
+                        borderRadius: 0,
+                        y: 0,
+                        x: 0,
+                        scale: 1,
                     },
                     to: {
-                        height: this.props.width,
                         borderRadius: 200,
-                        y: translateToY,
-                        x: translateToX,
-                        scale: .3,
+                        height: this.props.width,
+                        width: this.props.width,
+                       // borderRadius: 200,
+                       y: translateToY,
+                       x: translateToX,
+                       scale: .3,
                     },
-                    duration: 900
+                    duration: 700
                 })
                 .start(circular.set)
 
@@ -239,6 +245,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                         tween({
                             from: {
                                 height: this.props.width,
+                                width: this.props.width,
                                 borderRadius: 200,
                                 y: translateToY,
                                 x: translateToX,
@@ -246,21 +253,24 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                             },
                             to: {
                                 height: this.props.width,
+                                width: this.props.width,
                                 borderRadius: 200,
                                 y: initialY(),
                                 x: initialX(),
-                                scale: 0.6
+                                scale: 0.4
                             },
                             duration: 1500
                         }),
                         tween({
                             from: {
                                 height: this.props.width,
+                                width: this.props.width,
                                 borderRadius: 200, 
-                                scale: 0.6
+                                scale: 0.4
                             },
                             to: {
                                 height: this.props.height,
+                                width: this.props.width,
                                 borderRadius: 0, 
                                 scale: 1,
                             },
