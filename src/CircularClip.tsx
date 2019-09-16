@@ -3,6 +3,9 @@ import styled from "styled-components"
 import * as React from "react"
 import { easeInOut } from "@popmotion/easing"
 
+let id: any = null
+let i = 0
+
 namespace Style {
     export const left = ({ fullScreen, click, x }: Circular.State) => fullScreen === 0 || click === 0 ? "0" : `${-x}`
     export const zIndex = ({ fullScreen, click }: Circular.State) => fullScreen === 0 || click === 0 ? "0" : "100"
@@ -40,7 +43,11 @@ namespace Circular {
     export interface State {
         contentHeight: number
         fullScreen: number
+        duration: number
         click: number
+        start: number
+        xArr: number[]
+        yArr: number[]
         x: number
         y: number
     }
@@ -86,205 +93,75 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     public state: Circular.State = {
         contentHeight: 0,
         fullScreen: 0,
+        duration: 4,
         click: 0,
+        start: 0,
+        xArr: [],
+        yArr: [],
         x: 0,
         y: 0,
     }
 
     public componentDidMount() {
+        const x = this.Main.getBoundingClientRect().left
+        const y = this.Main.getBoundingClientRect().top
+        const translateToX = window.innerWidth - x
+        let R
+        let newX
+        let newY
+        let xArr = []
+        let yArr = []
         //console.log(this.props.children[0])
+
+        if (x < translateToX) {
+            R = (translateToX - x) / 2
+        } else {
+            R = (x - translateToX) / 2
+        }
+       // console.log(R)
+        for (let i = 0; i < 180; i++) {
+            newX = (R * Math.cos(i * 0.5 * Math.PI / 180))
+            xArr.push(newX)
+            newY = ((R * 0.55) * Math.sin(i *  Math.PI / 180) )
+            yArr.push(newY)
+        }
+
         this.setState({
-            x: this.Main.getBoundingClientRect().left, 
-            y: this.Main.getBoundingClientRect().top,
+            xArr: xArr.reverse(),
+            yArr: yArr.reverse(),
+            x, 
+            y,
         })
     }
 
-    public onStart = () => {
+    public onStart = (timestamp) => {
         const card = this.Circular
         const content = this.Content
         const circular = styler(card)
         const animateContent = styler(content)
-        const { click, x, y} = this.state
-        const windowWidth = window.innerWidth
-        const windowHeight = window.innerHeight
-        const translateToY = windowHeight / 8 - y
-        const translateToX = windowWidth / 2.2 - x
-        const contentY = 500 - y//windowHeight  * 0.45 - y 
-        console.log(windowWidth)
+
+        const { click, x, y, xArr, yArr} = this.state
+
         const initialY = () => {
             return y !== 0 ? 0 : y 
         }
         const initialX = () => {
             return x !== 0 ? 0 : x 
         }
+
         if (click < 1) {
-            chain(
-                tween({
-                    from: {
-                        height: this.props.width,
-                        borderRadius: 200,
-                        y: initialY(),
-                        x: initialX(),
-                        scale: 1,
-                    },
-                    to: {
-                        height: this.props.width,
-                        borderRadius: 200,
-                        y: initialY(),
-                        x: initialX(),
-                        scale: 0.4,
-                    },
-                    duration: 300
-                }),
-                tween({
-                    from: {
-                        height: this.props.width,
-                        borderRadius: 200,
-                        y: initialY(),
-                        x: initialX(),
-                        scale: 0.4, 
-                    }, 
-                    to: {
-                        height: this.props.width,
-                        borderRadius: 200,
-                        y: translateToY,
-                        x: translateToX,
-                        scale: 0.3, 
-                    },
-                    duration: 1500,
-                    ease: easeInOut
-                }),
-            )
-            .start(circular.set)
-
-            setTimeout(() => {
-                tween({
-                    from : { 
-                        borderRadius: 400,
-                        height: this.props.width,
-                        width: this.props.width,
-                        y: translateToY + y,
-                        x: translateToX + x,
-                        scale: 0.3, 
-                    },
-                    to: {
-                        borderRadius: 0,
-                        height: "500px",
-                        width: (windowWidth * 0.994) + "px",
-                        scaleX: 1,
-                        y,
-                        x,
-                    },
-                    duration: 550,
-                })
-                    .start(circular.set)
-
-                this.setState({ fullScreen: 1, click: 1 })
-            }, 1900)
-
-            setTimeout(() => {
-                tween({
-                    from: {
-                        y: contentY * 2,
-                        scaleY: 0.1,
-                        x,  
-                    },
-                    to: {
-                        y: contentY,
-                        scaleY: 1,
-                        x,
-                    },
-                    duration: 300,
-                })
-                    .start(animateContent.set)
-
-                this.setState({ contentHeight: 1 })
-            }, 2300)
-        } else {
+            card.style.left = xArr[i] 
+            card.style.top = yArr[i]
             
-            tween({
-                from: {
-                    y: contentY,
-                    scaleY: 1,
-                    x: 0,
-                },
-                to: {
-                    y: contentY * 2,
-                    scaleY: 0,
-                    x: 0,
-                },
-                duration: 400
-            })
-            .start(animateContent.set)
-            
-            setTimeout(() => {
-                tween({
-                    from: {
-                        height: "500px",
-                        width: windowWidth + "px",
-                        borderRadius: 0,
-                        y: 0,
-                        x: 0,
-                        scale: 1,
-                    },
-                    to: {
-                        borderRadius: 200,
-                        height: this.props.width,
-                        width: this.props.width,
-                       // borderRadius: 200,
-                       y: translateToY,
-                       x: translateToX,
-                       scale: .3,
-                    },
-                    duration: 700
-                })
-                .start(circular.set)
-
-                setTimeout(() => {
-                    chain(
-                        tween({
-                            from: {
-                                height: this.props.width,
-                                width: this.props.width,
-                                borderRadius: 200,
-                                y: translateToY,
-                                x: translateToX,
-                                scale: .3,
-                            },
-                            to: {
-                                height: this.props.width,
-                                width: this.props.width,
-                                borderRadius: 200,
-                                y: initialY(),
-                                x: initialX(),
-                                scale: 0.4
-                            },
-                            duration: 1500
-                        }),
-                        tween({
-                            from: {
-                                height: this.props.width,
-                                width: this.props.width,
-                                borderRadius: 200, 
-                                scale: 0.4
-                            },
-                            to: {
-                                height: this.props.height,
-                                width: this.props.width,
-                                borderRadius: 0, 
-                                scale: 1,
-                            },
-                            duration: 800
-                        }),
-                    )
-                    .start(circular.set)
-                }, 800)
-                
-                this.setState({ fullScreen: 1, click: 0 })
-            }, 300)
-            
+            i++
+            id = requestAnimationFrame(this.onStart)
+            // if (xNow <= (windowWidth / 2.2)) {
+            //     this.cancel_animation()
+            // } 
         }
     }
+
+    public cancel_animation = () => cancelAnimationFrame(id)
 
     public render() {
          return (

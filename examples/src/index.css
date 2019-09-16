@@ -6,10 +6,19 @@ body{
     display: flex;
     justify-content: space-around;
 } */
+.point{
+    width: 5px;
+    height: 5px;
+    background: #000;
+    margin-top: 314px;
+    margin-left: 926px;
+
+}
 
 .circ{
-    margin-top: 10px;
-    margin-left: 100px;
+    margin-top: 170px;
+    margin-left: 150px;
+    z-index: -99;
 }
 
 .child{
