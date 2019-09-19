@@ -13,6 +13,7 @@ export default class App extends Component {
                     contentColor="#2a2b2b"
                     width="250px"
                     height="250px"
+                    duration={1000}
                 >
                     <h1>React Card Expansion</h1>
                     <div className="child">
