@@ -46,6 +46,7 @@ namespace Circular {
         yArrReversed: number[]
         contentHeight: number
         fullScreen: number
+        reversedY: number
         duration: number
         xArr: number[]
         yArr: number[]
@@ -98,6 +99,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         yArrReversed: [],
         contentHeight: 0,
         fullScreen: 0,
+        reversedY: 0,
         duration: 4,
         click: 0,
         start: 0,
@@ -125,7 +127,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             R = -(x - translateToX) / 2.2
         }
 
-        for (let i = 0; i < 180; i++) {
+        for (let i = 0; i < 180; i += 1.5) {
             if (x < translateToX) {
                 newX = (R * Math.cos(i * .5 * Math.PI / 180))
                 xArr.push(newX)
@@ -143,6 +145,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             newY = -i * 5.1
             if (-Math.floor(newY) <= y - 30) {
                 yArr.unshift(newY)
+                this.setState({ reversedY: i })
             }
         }
 
@@ -157,7 +160,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             x,
             y,
         })
-        console.log(yArr, yArrReversed)
+        //console.log(yArr, yArrReversed)
     }
 
     public onStart = (timestamp) => {
@@ -166,7 +169,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const circular = styler(card)
         const animateContent = styler(content)
 
-        const { click, x, y, xArr, yArr, xArrReversed, yArrReversed } = this.state
+        const { click, x, y, xArr, yArr, xArrReversed, yArrReversed, reversedY } = this.state
         const { duration } = this.props
 
         const xNow = card.getBoundingClientRect().left
@@ -190,10 +193,9 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 }).start(circular.set)
             }
 
-            let progress = timestamp / duration
             card.style.left = xArrReversed[i]
             card.style.top = yArrReversed[i]
-
+           // console.log(timestamp / duration / 10)
             i++
             id = window.requestAnimationFrame(this.onStart)
 
@@ -212,11 +214,11 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                         },
                         to: {
                             borderRadius: 0,
-                            height: "500px",
+                            height: "510px",
                             width: (window.innerWidth * 0.994) + "px",
                             scaleX: 1,
                             x: -(xNow - card.getBoundingClientRect().width + 25) ,
-                            y: -32,
+                            y: -35,
                         },
                         duration: 550,
                     })
@@ -256,11 +258,10 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                         scaleY: 0,
                         x: 0,
                     },
-                    duration: 400
+                    duration: 500
                 })
                     .start(animateContent.set)
-
-
+    
                 tween({
                     from: {
                         borderRadius: 200,
@@ -278,17 +279,18 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                         y: 0,
                         scale: .4,
                     },
-                    duration: 700
+                    duration: 900
                 }).start(circular.set)
             }
 
-            card.style.left = xArr[j]
             card.style.top = yArr[j]
-            
+            if (j > reversedY) {
+            card.style.left = xArr[j - reversedY]
+            }
+           
             j++
-
             id = requestAnimationFrame(this.onStart)
-
+            
             if (yArrReversed.slice(j).length === 0) {
                 this.cancel_animation()
                 
