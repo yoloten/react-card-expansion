@@ -34,8 +34,6 @@ import { CircularClip } from 'react-card-expansion'
 class Example extends React.Component {
  
   render() {
-    const arr = ["first", "second", "third", "fourth"]
-    const numbers = [0, 1, 2, 3]
     return (
       <div>
         <CircularClip 
