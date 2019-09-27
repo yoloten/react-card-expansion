@@ -1,7 +1,7 @@
 # React-Card-Expansion
 
 Unique card animation for react. Inspired by tympanus.net. 
-See the demo https://yoloten.github.io/react-stack-cards/
+See the demo https://yoloten.github.io/react-card-expansion/
 
 Feautures: 
 
