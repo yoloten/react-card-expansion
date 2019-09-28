@@ -5,8 +5,8 @@ import * as React from "react"
 let id: any = null
 let i = 0
 let j = 0
-//let start: number = 0
-
+const start = new Date()
+ 
 namespace Style {
     export const left = () => "0" 
     export const zIndex = ({ click }: Circular.State) => click === 0 ? "0" : "100"
@@ -113,56 +113,74 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const y = this.Circular.getBoundingClientRect().top
         const translateToX = window.innerWidth - x - this.Circular.getBoundingClientRect().width
         
-        let time = duration / 1000
-        let dur1 = time > 4 ? ((6 + (time - 5)) - time) : (5 - time)
-        let dur2 = (duration / 100) > 29 ? ((35 + ( duration / 100 - 30) - (duration / 100))) : (30 - (duration / 100))
-        let R
-        let newX
-        let newY
-        let xArr = []
-        let yArr = []
+        // let time = duration / 1000
+        // let dur1 = time > 4 ? ((6 + (time - (5 + time / 15))) - time * 0.99) : (5 - time)
+        // let dur2 = (duration / 100) > 29 ? ((35 + ( duration / 100 - 30) - (duration / 100))) : (30 - (duration / 100))
+        // let R
+        // let newX
+        // let newY
+        // let xArr = []
+        // let yArr = []
+        // console.log(dur1)
+        // if (x < translateToX) {
+        //     R = (translateToX - x) / 2.2
+        // } else {
+        //     R = -(x - translateToX) / 2.2
+        // }
 
-        if (x < translateToX) {
-            R = (translateToX - x) / 2.2
-        } else {
-            R = -(x - translateToX) / 2.2
-        }
+        // for (let i = 0; i < 180; i += dur1) {
+        //     if (x < translateToX) {
+        //         newX = (R * Math.cos(i * .5 * Math.PI / 180))
+        //         xArr.push(newX)
+        //         newY = ((R * 0.39) * Math.sin(i * Math.PI / 180)) 
+        //         yArr.push(newY)
+        //     } else {
+        //         newX = (R * Math.cos(i * 0.5 * Math.PI / 180))
+        //         xArr.push(newX)
+        //         newY = -((R * 0.49) * Math.sin(i * Math.PI / 180))
+        //         yArr.push(newY)
+        //     }
+        // }
 
-        for (let i = 0; i < 180; i += dur1) {
-            if (x < translateToX) {
-                newX = (R * Math.cos(i * .5 * Math.PI / 180))
-                xArr.push(newX)
-                newY = ((R * 0.39) * Math.sin(i * Math.PI / 180)) 
-                yArr.push(newY)
-            } else {
-                newX = (R * Math.cos(i * 0.5 * Math.PI / 180))
-                xArr.push(newX)
-                newY = -((R * 0.49) * Math.sin(i * Math.PI / 180))
-                yArr.push(newY)
-            }
-        }
+        // for (let i = 0; i <= y - 30; i++) {
+        //     newY = -i * dur2
+        //     if (-Math.floor(newY) <= y - 30) {
+        //         yArr.unshift(newY)
+        //         this.setState({ reversedY: i })
+        //     }
+        // }
 
-        for (let i = 0; i <= y - 30; i++) {
-            newY = -i * dur2
-            if (-Math.floor(newY) <= y - 30) {
-                yArr.unshift(newY)
-                this.setState({ reversedY: i })
-            }
-        }
-
-        const xArrReversed = [...xArr].reverse()
-        const yArrReversed = [...yArr].reverse()
+        // const xArrReversed = [...xArr].reverse()
+        // const yArrReversed = [...yArr].reverse()
         
         this.setState({
             width: this.Circular.getBoundingClientRect().width,
-            xArrReversed,
-            yArrReversed,
-            xArr,
-            yArr,
+            // xArrReversed,
+            // yArrReversed,
+            // xArr,
+            // yArr,
             x,
             y,
         })
         //console.log(yArr, yArrReversed)
+    }
+
+    public easeOut = (t) => t<.5 ? 2*t*t : -1+(4-2*t)*t
+      
+    public path = (start, end, ease) => {
+        let R
+
+        if (start < end) {
+            R = (end - start) / 2.2
+        } else {
+            R = -(start - end) / 2.2
+        }
+        
+        if (start === this.state.x) {
+            return (R * Math.cos(ease * 2))
+        } else {
+            return (R * Math.sin(ease * 5)) - 100
+        }
     }
 
     public onStart = (timestamp) => {
@@ -176,77 +194,80 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
 
         const xNow = card.getBoundingClientRect().left
         const yNow = card.getBoundingClientRect().top
-        const contentY = 500 - y
+        const translateToX = window.innerWidth - x - width
+
+        let now = new Date()
+        let elapsed = now.getTime() - start.getTime()
 
         if (click < 1) {
-            if (i === 0) {
-                tween({
-                    from: {
-                        height: this.props.width,
-                        borderRadius: 200,
-                        scale: 1,
-                    },
-                    to: {
-                        height: this.props.width,
-                        borderRadius: 200,
-                        scale: 0.4,
-                    },
-                    duration: 700
-                }).start(circular.set)
-            }
+            // if (i === 0) {
+            //     tween({
+            //         from: {
+            //             height: this.props.width,
+            //             borderRadius: 200,
+            //             scale: 1,
+            //         },
+            //         to: {
+            //             height: this.props.width,
+            //             borderRadius: 200,
+            //             scale: 0.4,
+            //         },
+            //         duration: 700
+            //     }).start(circular.set)
+            // }
 
-            card.style.left = xArrReversed[i]
-            card.style.top = yArrReversed[i]
-            //console.log(this.props.width)
+            card.style.left = this.path(x, translateToX, this.easeOut(duration / (elapsed + duration)))
+            card.style.top = this.path(y, y - 200, this.easeOut(duration / (elapsed + duration)))
+            //console.log(this.easeIn(duration / (elapsed + duration)))
             i++
             id = window.requestAnimationFrame(this.onStart)
 
-            if (yArr.slice(i).length === 0) {
-                this.cancel_animation()
+            // if (yArr.slice(i).length === 0) {
+            //     this.cancel_animation()
                 
-                setTimeout(() => {
-                    tween({
-                        from: {
-                            borderRadius: 200,
-                            height: this.props.width,
-                            width: this.props.width,
-                            scale: 0.3,
-                            x: 0,
-                            y: 0,
-                        },
-                        to: {
-                            borderRadius: 0,
-                            height: "520px",
-                            width: (window.innerWidth * 0.994) + "px",
-                            scaleX: 1,
-                            x: -(xNow - width / 3.35) , 
-                            y: y < 40 ? -y : -35,
-                        },
-                        duration: 550,
-                    })
-                        .start(circular.set)
-                }, 300)
+            //     setTimeout(() => {
+            //         tween({
+            //             from: {
+            //                 borderRadius: 200,
+            //                 height: this.props.width,
+            //                 width: this.props.width,
+            //                 scale: 0.3,
+            //                 x: 0,
+            //                 y: 0,
+            //             },
+            //             to: {
+            //                 borderRadius: 0,
+            //                 height: "520px",
+            //                 width: (window.innerWidth * 0.994) + "px",
+            //                 scaleX: 1,
+            //                 x: -(xNow - width / 3.35) , 
+            //                 y: y < 40 ? -y : -35,
+            //             },
+            //             duration: 550,
+            //         })
+            //             .start(circular.set)
+            //     }, 300)
 
-                setTimeout(() => {
-                    tween({
-                        from: {
-                            y: 1000,
-                            scaleY: 0.1,
-                            x: 0,
-                        },
-                        to: {
-                            y: 500,
-                            scaleY: 1,
-                            x: 0,
-                        },
-                        duration: 300,
-                    })
-                        .start(animateContent.set)
+            //     setTimeout(() => {
+            //         tween({
+            //             from: {
+            //                 y: 1000,
+            //                 scaleY: 0.1,
+            //                 x: 0,
+            //             },
+            //             to: {
+            //                 y: 500,
+            //                 scaleY: 1,
+            //                 x: 0,
+            //             },
+            //             duration: 300,
+            //         })
+            //             .start(animateContent.set)
 
-                    this.setState({ contentHeight: 1, click: 1 })
-                }, 700)
-                i = 0
-            }
+            //         this.setState({ contentHeight: 1, click: 1 })
+            //     }, 700)
+            //     i = 0
+            // }
         } else {
             if (j === 0) {
                 tween({
