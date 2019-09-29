@@ -5,10 +5,10 @@ import * as React from "react"
 let id: any = null
 let i = 0
 let j = 0
-const start = new Date()
- 
+let start = 0
+
 namespace Style {
-    export const left = () => "0" 
+    export const left = () => "0"
     export const zIndex = ({ click }: Circular.State) => click === 0 ? "0" : "100"
     export const display = ({ contentHeight }: Circular.State) => contentHeight === 0 ? "none" : ""
     export const heightContent = ({ contentHeight, children }: Circular.State) => {
@@ -16,7 +16,7 @@ namespace Style {
         if (children && children.length !== 0) { return "" }
         return "60vh"
     }
-    export const cardHeight = ({ height }: Circular.Props) => height 
+    export const cardHeight = ({ height }: Circular.Props) => height
     export const bgImage = ({ headerImage }: Circular.Props) => headerImage
     export const cardWidth = ({ width }: Circular.Props) => width
     export const contentBgColor = ({ contentColor }: Circular.Props) => contentColor
@@ -47,8 +47,8 @@ namespace Circular {
         xArr: number[]
         yArr: number[]
         click: number
-        width: number
         start: number
+        toX: number
         x: number
         y: number
     }
@@ -98,89 +98,46 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         fullScreen: 0,
         reversedY: 0,
         duration: 4,
-        width: 0,
         click: 0,
         start: 0,
         xArr: [],
         yArr: [],
+        toX: 0,
         x: 0,
         y: 0,
     }
 
     public componentDidMount() {
-        const { duration } = this.props
         const x = this.Circular.getBoundingClientRect().left
         const y = this.Circular.getBoundingClientRect().top
-        const translateToX = window.innerWidth - x - this.Circular.getBoundingClientRect().width
-        
-        // let time = duration / 1000
-        // let dur1 = time > 4 ? ((6 + (time - (5 + time / 15))) - time * 0.99) : (5 - time)
-        // let dur2 = (duration / 100) > 29 ? ((35 + ( duration / 100 - 30) - (duration / 100))) : (30 - (duration / 100))
-        // let R
-        // let newX
-        // let newY
-        // let xArr = []
-        // let yArr = []
-        // console.log(dur1)
-        // if (x < translateToX) {
-        //     R = (translateToX - x) / 2.2
-        // } else {
-        //     R = -(x - translateToX) / 2.2
-        // }
+        const translateToX = (window.innerWidth - x - this.Circular.getBoundingClientRect().width) / 2
 
-        // for (let i = 0; i < 180; i += dur1) {
-        //     if (x < translateToX) {
-        //         newX = (R * Math.cos(i * .5 * Math.PI / 180))
-        //         xArr.push(newX)
-        //         newY = ((R * 0.39) * Math.sin(i * Math.PI / 180)) 
-        //         yArr.push(newY)
-        //     } else {
-        //         newX = (R * Math.cos(i * 0.5 * Math.PI / 180))
-        //         xArr.push(newX)
-        //         newY = -((R * 0.49) * Math.sin(i * Math.PI / 180))
-        //         yArr.push(newY)
-        //     }
-        // }
-
-        // for (let i = 0; i <= y - 30; i++) {
-        //     newY = -i * dur2
-        //     if (-Math.floor(newY) <= y - 30) {
-        //         yArr.unshift(newY)
-        //         this.setState({ reversedY: i })
-        //     }
-        // }
-
-        // const xArrReversed = [...xArr].reverse()
-        // const yArrReversed = [...yArr].reverse()
-        
         this.setState({
-            width: this.Circular.getBoundingClientRect().width,
-            // xArrReversed,
-            // yArrReversed,
-            // xArr,
-            // yArr,
+            toX: translateToX,
             x,
             y,
         })
-        //console.log(yArr, yArrReversed)
     }
 
-    public easeOut = (t) => t<.5 ? 2*t*t : -1+(4-2*t)*t
-      
+    public lerp = (start, end, amt) => (1 - amt) * start + amt * end
+
+    public easeIn = (t) => t * t 
+
     public path = (start, end, ease) => {
-        let R
+        let R 
+        let x 
+        let y
 
         if (start < end) {
-            R = (end - start) / 2.2
+            R = (end - start) 
         } else {
-            R = -(start - end) / 2.2
+            R = -(start - end) 
         }
-        
-        if (start === this.state.x) {
-            return (R * Math.cos(ease * 2))
-        } else {
-            return (R * Math.sin(ease * 5)) - 100
-        }
+
+        x = R * (this.lerp(1, 0, ease))
+        y = Math.sin(this.lerp(100, 0, ease) / 20 ) * this.state.y + 30
+
+        return {x, y}
     }
 
     public onStart = (timestamp) => {
@@ -189,157 +146,23 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const circular = styler(card)
         const animateContent = styler(content)
 
-        const { click, x, y, xArr, yArr, xArrReversed, yArrReversed, reversedY, width } = this.state
+        const { click, x, y, toX } = this.state
         const { duration } = this.props
 
-        const xNow = card.getBoundingClientRect().left
-        const yNow = card.getBoundingClientRect().top
-        const translateToX = window.innerWidth - x - width
-
-        let now = new Date()
-        let elapsed = now.getTime() - start.getTime()
-
+        start === 0 ? start = performance.now() : ""
+        
+        const elapsed = performance.now() - start
+        //console.log(card.getBoundingClientRect().y)
         if (click < 1) {
-            // if (i === 0) {
-            //     tween({
-            //         from: {
-            //             height: this.props.width,
-            //             borderRadius: 200,
-            //             scale: 1,
-            //         },
-            //         to: {
-            //             height: this.props.width,
-            //             borderRadius: 200,
-            //             scale: 0.4,
-            //         },
-            //         duration: 700
-            //     }).start(circular.set)
-            // }
-
-            card.style.left = this.path(x, translateToX, this.easeOut(duration / (elapsed + duration)))
-            card.style.top = this.path(y, y - 200, this.easeOut(duration / (elapsed + duration)))
-            //console.log(this.easeIn(duration / (elapsed + duration)))
+            
+            card.style.left = this.path(0, toX, this.easeIn(duration / (elapsed + duration))).x
+            card.style.top = this.path(0, y, this.easeIn(duration / (elapsed + duration))).y
+            //console.log(this.lerp(0, 1, this.easeOut(duration / elapsed)))
             i++
             id = window.requestAnimationFrame(this.onStart)
 
-            // if (yArr.slice(i).length === 0) {
-            //     this.cancel_animation()
-                
-            //     setTimeout(() => {
-            //         tween({
-            //             from: {
-            //                 borderRadius: 200,
-            //                 height: this.props.width,
-            //                 width: this.props.width,
-            //                 scale: 0.3,
-            //                 x: 0,
-            //                 y: 0,
-            //             },
-            //             to: {
-            //                 borderRadius: 0,
-            //                 height: "520px",
-            //                 width: (window.innerWidth * 0.994) + "px",
-            //                 scaleX: 1,
-            //                 x: -(xNow - width / 3.35) , 
-            //                 y: y < 40 ? -y : -35,
-            //             },
-            //             duration: 550,
-            //         })
-            //             .start(circular.set)
-            //     }, 300)
-
-            //     setTimeout(() => {
-            //         tween({
-            //             from: {
-            //                 y: 1000,
-            //                 scaleY: 0.1,
-            //                 x: 0,
-            //             },
-            //             to: {
-            //                 y: 500,
-            //                 scaleY: 1,
-            //                 x: 0,
-            //             },
-            //             duration: 300,
-            //         })
-            //             .start(animateContent.set)
-
-            //         this.setState({ contentHeight: 1, click: 1 })
-            //     }, 700)
-            //     i = 0
-            // }
         } else {
-            if (j === 0) {
-                tween({
-                    from: {
-                        y: 500,
-                        scaleY: 1,
-                        x: 0,
-                    },
-                    to: {
-                        y: 1000,
-                        scaleY: 0,
-                        x: 0,
-                    },
-                    duration: 500
-                })
-                    .start(animateContent.set)
-    
-                tween({
-                    from: {
-                        borderRadius: 200,
-                        height: "500px",
-                        width: (window.innerWidth * 0.995) + "px",
-                        scale: 1,
-                        x: -window.innerWidth / 2.49,
-                        y: -32,
-                    },
-                    to: {
-                        borderRadius: 200,
-                        height: this.props.width,
-                        width: this.props.width,
-                        x: 0,
-                        y: 0,
-                        scale: .4,
-                    },
-                    duration: 900
-                }).start(circular.set)
-            }
-
-            card.style.top = yArr[j]
-            if (j > reversedY) {
-            card.style.left = xArr[j - reversedY]
-            }
-           
-            j++
-            id = requestAnimationFrame(this.onStart)
-            
-            if (yArrReversed.slice(j).length === 0) {
-                this.cancel_animation()
-                
-                tween({
-                    from: {
-                        borderRadius: 200,
-                        height: this.props.width,
-                        width: this.props.width,
-                        x: 0,
-                        y: 0,
-                        scale: .4,
-                    },
-                    to: {
-                        borderRadius: 0,
-                        height: this.props.height,
-                        width: this.props.width,
-                        x: 0,
-                        y: 0,
-                        scale: 1,
-                    },
-                    duration: 700
-                }).start(circular.set)
-
-                this.setState({ click: 0 })
-                j = 0
-            }
+            //
         }
     }
 
