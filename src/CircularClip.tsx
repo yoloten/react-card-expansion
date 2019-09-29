@@ -2,9 +2,6 @@ import { tween, styler, chain, delay } from "popmotion"
 import styled from "styled-components"
 import * as React from "react"
 
-let id: any = null
-let i = 0
-let j = 0
 let start = 0
 
 namespace Style {
@@ -38,14 +35,9 @@ namespace Circular {
         width: string
     }
     export interface State {
-        xArrReversed: number[]
-        yArrReversed: number[]
         contentHeight: number
         fullScreen: number
-        reversedY: number
-        duration: number
-        xArr: number[]
-        yArr: number[]
+        cardWidth: number
         click: number
         start: number
         toX: number
@@ -92,16 +84,11 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     }
 
     public state: Circular.State = {
-        xArrReversed: [],
-        yArrReversed: [],
         contentHeight: 0,
         fullScreen: 0,
-        reversedY: 0,
-        duration: 4,
+        cardWidth: 0,
         click: 0,
         start: 0,
-        xArr: [],
-        yArr: [],
         toX: 0,
         x: 0,
         y: 0,
@@ -110,9 +97,10 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     public componentDidMount() {
         const x = this.Circular.getBoundingClientRect().left
         const y = this.Circular.getBoundingClientRect().top
-        const translateToX = (window.innerWidth - x - this.Circular.getBoundingClientRect().width) / 2
+        const translateToX = (window.innerWidth - this.Circular.getBoundingClientRect().width) / 2
 
         this.setState({
+            cardWidth: this.Circular.getBoundingClientRect().width,
             toX: translateToX,
             x,
             y,
@@ -121,52 +109,200 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
 
     public lerp = (start, end, amt) => (1 - amt) * start + amt * end
 
-    public easeIn = (t) => t * t 
+    public easeIn = (t) => t * t
 
     public path = (start, end, ease) => {
-        let R 
-        let x 
-        let y
+        const { y } = this.state
+        let radious
+        let newX
+        let newY
 
         if (start < end) {
-            R = (end - start) 
+            radious = (end - start) + 50
         } else {
-            R = -(start - end) 
+            radious = -(start - end) - 45
         }
 
-        x = R * (this.lerp(1, 0, ease))
-        y = Math.sin(this.lerp(100, 0, ease) / 20 ) * this.state.y + 30
-
-        return {x, y}
+        newX = radious * (this.lerp(1, 0, ease))
+        newY = Math.sin(this.lerp(100, 0, ease) / 20) * y + 30
+            // -Math.sin(this.lerp(200, 100, ease) / 20) * y 
+    
+        return { x: newX, y: newY }
     }
 
-    public onStart = (timestamp) => {
-        const card = this.Circular
-        const content = this.Content
-        const circular = styler(card)
-        const animateContent = styler(content)
+    public initialCircular = (circular: any) => {
+        const { width } = this.props
 
+        tween({
+            from: {
+                height: width,
+                borderRadius: 200,
+                scale: 1,
+            },
+            to: {
+                height: width,
+                borderRadius: 200,
+                scale: 0.4,
+            },
+            duration: 700
+        }).start(circular.set)
+    }
+
+    public expansion = (circular: any, animateContent: any, xNow: number, yNow: number) => {
+        const { width } = this.props
+        const { cardWidth, y} = this.state
+       // console.log(xNow)
+        setTimeout(() => {
+            tween({
+                from: {
+                    borderRadius: 200,
+                    height: width,
+                    scale: 0.3,
+                    width,
+                    x: 0,
+                    y: 0,
+                },
+                to: {
+                    borderRadius: 0,
+                    height: "500px",
+                    width: (window.innerWidth * 0.993) + "px",
+                    scaleX: 1,
+                    x: -(xNow - cardWidth / 3.35),
+                    y: y < 40 ? -y : -yNow,
+                },
+                duration: 550,
+            })
+                .start(circular.set)
+        }, 300)
+
+        setTimeout(() => {
+            tween({
+                from: {
+                    y: 1000,
+                    scaleY: 0.1,
+                    x: 0,
+                },
+                to: {
+                    y: 500,
+                    scaleY: 1,
+                    x: 0,
+                },
+                duration: 300,
+            })
+                .start(animateContent.set)
+
+            this.setState({ contentHeight: 1, click: 1 })
+        }, 700)
+    }
+
+    public backToCircular = (circular: any, animateContent: any) => {
+        const { width } = this.props
+
+        tween({
+            from: {
+                y: 500,
+                scaleY: 1,
+                x: 0,
+            },
+            to: {
+                y: 1000,
+                scaleY: 0,
+                x: 0,
+            },
+            duration: 500
+        })
+            .start(animateContent.set)
+
+        tween({
+            from: {
+                borderRadius: 200,
+                height: "500px",
+                width: (window.innerWidth * 0.995) + "px",
+                scale: 1,
+                x: -window.innerWidth / 2.49,
+                y: -32,
+            },
+            to: {
+                borderRadius: 200,
+                height: width,
+                width,
+                x: 0,
+                y: 0,
+                scale: .4,
+            },
+            duration: 900
+        }).start(circular.set)
+    }
+
+    public backToInitial = (circular: any) => {
+        tween({
+            from: {
+                borderRadius: 200,
+                height: this.props.width,
+                width: this.props.width,
+                x: 0,
+                y: 0,
+                scale: .4,
+            },
+            to: {
+                borderRadius: 0,
+                height: this.props.height,
+                width: this.props.width,
+                x: 0,
+                y: 0,
+                scale: 1,
+            },
+            duration: 700
+        }).start(circular.set)
+    }
+
+    public onStart = () => {
+        const circular = styler(this.Circular)
+        const animateContent = styler(this.Content)
+
+        let id = null
         const { click, x, y, toX } = this.state
         const { duration } = this.props
 
         start === 0 ? start = performance.now() : ""
-        
+
         const elapsed = performance.now() - start
-        //console.log(card.getBoundingClientRect().y)
+        const xNow = this.Circular.getBoundingClientRect().x
+        const yNow = Math.floor(this.Circular.getBoundingClientRect().y * 0.3) 
+
         if (click < 1) {
-            
-            card.style.left = this.path(0, toX, this.easeIn(duration / (elapsed + duration))).x
-            card.style.top = this.path(0, y, this.easeIn(duration / (elapsed + duration))).y
-            //console.log(this.lerp(0, 1, this.easeOut(duration / elapsed)))
-            i++
+            if (xNow === x) {
+                this.initialCircular(circular)
+            }
+            this.Circular.style.left = this.path(x, toX, this.easeIn(duration / (elapsed + duration))).x
+            this.Circular.style.top = this.path(0, y, this.easeIn(duration / (elapsed + duration))).y
+
             id = window.requestAnimationFrame(this.onStart)
 
+           // console.log(xNow, toX, yNow)
+            //xNow === Math.floor(toX) || xNow === Math.floor(toX) + 1 || xNow === Math.floor(toX) - 1
+            if (yNow === 31) {
+                cancelAnimationFrame(id)
+                this.expansion(circular, animateContent, xNow, yNow)
+            }
+
         } else {
-            //
+            if( yNow === 0 ) {
+                this.backToCircular(circular, animateContent)
+            }
+
+            this.Circular.style.left = this.path(x, toX, this.easeIn(duration / (elapsed + duration))).x
+            this.Circular.style.top = this.path(0, y, this.easeIn(duration / (elapsed + duration))).y
+
+            id = window.requestAnimationFrame(this.onStart)
+            
+            // if (yNow > 0) {
+            //     cancelAnimationFrame(id)
+            //     this.backToInitial(circular)
+            // }
+
         }
     }
-
-    public cancel_animation = () => cancelAnimationFrame(id)
 
     public render() {
         return (
