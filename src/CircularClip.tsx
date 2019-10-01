@@ -1,6 +1,8 @@
 import { tween, styler, chain, delay } from "popmotion"
 import styled from "styled-components"
 import * as React from "react"
+import EasingFunctions from "./easings"
+import lerp from "./lerp"
 
 let start = 0
 
@@ -15,6 +17,7 @@ namespace Style {
     }
     export const cardHeight = ({ height }: Circular.Props) => height
     export const bgImage = ({ headerImage }: Circular.Props) => headerImage
+    export const headerBgColor = ({ headerColor }: Circular.Props) => headerColor
     export const cardWidth = ({ width }: Circular.Props) => width
     export const contentBgColor = ({ contentColor }: Circular.Props) => contentColor
     export const cardTop = ({ click, y }: Circular.State) => {
@@ -32,6 +35,7 @@ namespace Circular {
         className: string
         duration: number
         height: string
+        easing: string
         width: string
     }
     export interface State {
@@ -39,7 +43,7 @@ namespace Circular {
         fullScreen: number
         cardWidth: number
         click: number
-        start: number
+        reverse: number
         toX: number
         x: number
         y: number
@@ -48,9 +52,11 @@ namespace Circular {
 // height:  ${Style.contentHeight};
 
 const Card = styled.div`
-    background: url(${ Style.bgImage}) no-repeat center center;
+    background: ${Style.headerBgColor};
+    background-image: url(${ Style.bgImage});
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center center;
     height:  ${Style.cardHeight};
     width: ${Style.cardWidth};
     top: ${Style.cardTop};
@@ -88,7 +94,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         fullScreen: 0,
         cardWidth: 0,
         click: 0,
-        start: 0,
+        reverse: 0,
         toX: 0,
         x: 0,
         y: 0,
@@ -107,26 +113,26 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         })
     }
 
-    public lerp = (start, end, amt) => (1 - amt) * start + amt * end
-
-    public easeIn = (t) => t * t
-
     public path = (start, end, ease) => {
-        const { y } = this.state
+        const { y, click } = this.state
         let radious
         let newX
         let newY
 
         if (start < end) {
-            radious = (end - start) + 50
+            radious = (end - start) //+ 50 
+                
         } else {
-            radious = -(start - end) - 45
+            radious = -(start - end) 
+        }
+        if (click < 1) {
+            newX = radious * (lerp(1, 0, ease))
+            newY = Math.sin(lerp(100, 0, ease) / 20) * y + 30
+        } else {
+            newX = radious * (lerp(0, 1, ease ))
+            newY = Math.sin(lerp(0, 100, ease) / 20)  * y   //- (y / 1.82)
         }
 
-        newX = radious * (this.lerp(1, 0, ease))
-        newY = Math.sin(this.lerp(100, 0, ease) / 20) * y + 30
-            // -Math.sin(this.lerp(200, 100, ease) / 20) * y 
-    
         return { x: newX, y: newY }
     }
 
@@ -135,12 +141,14 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
 
         tween({
             from: {
-                height: width,
+                height: 250,
+                width: 250,
                 borderRadius: 200,
                 scale: 1,
             },
             to: {
-                height: width,
+                height: 250,
+                width: 250,
                 borderRadius: 200,
                 scale: 0.4,
             },
@@ -150,25 +158,25 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
 
     public expansion = (circular: any, animateContent: any, xNow: number, yNow: number) => {
         const { width } = this.props
-        const { cardWidth, y} = this.state
-       // console.log(xNow)
+        const { cardWidth, y } = this.state
+        // console.log(xNow)
         setTimeout(() => {
             tween({
                 from: {
                     borderRadius: 200,
-                    height: width,
+                    height: 250,
+                    width: 250,
                     scale: 0.3,
-                    width,
                     x: 0,
                     y: 0,
                 },
                 to: {
                     borderRadius: 0,
-                    height: "500px",
-                    width: (window.innerWidth * 0.993) + "px",
+                    height: 501,
+                    width: window.innerWidth * 0.994,
                     scaleX: 1,
-                    x: -(xNow - cardWidth / 3.35),
-                    y: y < 40 ? -y : -yNow,
+                    x: -Math.round(xNow - 250 / 3.35),
+                    y: y < 40 ? -y : -yNow - 1,
                 },
                 duration: 550,
             })
@@ -195,7 +203,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         }, 700)
     }
 
-    public backToCircular = (circular: any, animateContent: any) => {
+    public backToCircular = (circular: any, animateContent: any, toX: number) => {
         const { width } = this.props
 
         tween({
@@ -218,19 +226,19 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 borderRadius: 200,
                 height: "500px",
                 width: (window.innerWidth * 0.995) + "px",
-                scale: 1,
-                x: -window.innerWidth / 2.49,
+                x: -600,
                 y: -32,
+                scale: 1,
             },
             to: {
                 borderRadius: 200,
-                height: width,
-                width,
+                height: 250,
+                width: 250,
                 x: 0,
                 y: 0,
                 scale: .4,
             },
-            duration: 900
+            duration: 300
         }).start(circular.set)
     }
 
@@ -238,18 +246,14 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         tween({
             from: {
                 borderRadius: 200,
-                height: this.props.width,
-                width: this.props.width,
-                x: 0,
-                y: 0,
+                height: 250,
+                width: 250,
                 scale: .4,
             },
             to: {
                 borderRadius: 0,
                 height: this.props.height,
                 width: this.props.width,
-                x: 0,
-                y: 0,
                 scale: 1,
             },
             duration: 700
@@ -261,45 +265,64 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const animateContent = styler(this.Content)
 
         let id = null
-        const { click, x, y, toX } = this.state
+        const { click, x, y, toX, reverse } = this.state
         const { duration } = this.props
 
-        start === 0 ? start = performance.now() : ""
+        start === 0
+            ? start = performance.now()
+            : ""
 
-        const elapsed = performance.now() - start
+        let elapsed = performance.now() - start
+
         const xNow = this.Circular.getBoundingClientRect().x
-        const yNow = Math.floor(this.Circular.getBoundingClientRect().y * 0.3) 
+        const yNow = Math.floor(this.Circular.getBoundingClientRect().y * 0.3)
+
+        const easing = EasingFunctions[this.props.easing]
+        let makeFaster
+        
+        if (x < toX ) {
+            makeFaster = (xNow - x) <= 100 ? 7 : 1 
+        } else {
+            makeFaster = (xNow - x) >= 50 ? 7 : 1 
+        }
 
         if (click < 1) {
             if (xNow === x) {
                 this.initialCircular(circular)
             }
-            this.Circular.style.left = this.path(x, toX, this.easeIn(duration / (elapsed + duration))).x
-            this.Circular.style.top = this.path(0, y, this.easeIn(duration / (elapsed + duration))).y
+            this.Circular.style.left = this.path(x, toX, easing(duration / (elapsed + duration))).x
+            this.Circular.style.top = this.path(0, y, easing(duration / (elapsed + duration))).y
 
             id = window.requestAnimationFrame(this.onStart)
 
-           // console.log(xNow, toX, yNow)
-            //xNow === Math.floor(toX) || xNow === Math.floor(toX) + 1 || xNow === Math.floor(toX) - 1
             if (yNow === 31) {
                 cancelAnimationFrame(id)
                 this.expansion(circular, animateContent, xNow, yNow)
+                start = 0
             }
 
         } else {
-            if( yNow === 0 ) {
-                this.backToCircular(circular, animateContent)
+            if (reverse === 0) {
+                this.backToCircular(circular, animateContent, toX)
+                this.setState({ reverse: 1 })
             }
-
-            this.Circular.style.left = this.path(x, toX, this.easeIn(duration / (elapsed + duration))).x
-            this.Circular.style.top = this.path(0, y, this.easeIn(duration / (elapsed + duration))).y
+             
+            console.log( xNow - x, makeFaster, xNow - 75)
+            this.Circular.style.left = this.path(x, toX, easing(duration / ((elapsed * makeFaster) + duration))).x
+            this.Circular.style.top = this.path(0, y, easing(duration / ((elapsed * makeFaster) + duration))).y
 
             id = window.requestAnimationFrame(this.onStart)
-            
-            // if (yNow > 0) {
-            //     cancelAnimationFrame(id)
-            //     this.backToInitial(circular)
-            // }
+
+            if (Math.floor(xNow - 75) === Math.floor(x + 1) 
+                    || Math.round(xNow - 75) === Math.round(x + 1)
+                    || Math.round(xNow - 75) === Math.round(x - 1)
+                    || Math.round(xNow - 75) === Math.round(x - 1)
+            ) {
+                cancelAnimationFrame(id)
+                this.backToInitial(circular)
+                this.setState({ click: 0, reverse: 0 })
+                start = 0
+            }
 
         }
     }
@@ -315,6 +338,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     className={this.props.className}
                     ref={(node: any) => this.Circular = node}
                     headerImage={this.props.headerImage}
+                    headerColor={this.props.headerColor}
                     fullScreen={this.state.fullScreen}
                     height={this.props.height}
                     width={this.props.width}
@@ -322,6 +346,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     onClick={this.onStart}
                     y={this.state.y}
                     x={this.state.x}
+                    easing={this.props.easing}
                     duration={this.props.duration}
                 />
 

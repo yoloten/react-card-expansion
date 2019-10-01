@@ -10,10 +10,12 @@ export default class App extends Component {
                 <CircularClip 
                     className="circ"
                     headerImage="http://i.imgur.com/J5wR1pO.jpg"
+                    headerColor="#000"
                     contentColor="#2a2b2b"
                     width="250px"
                     height="250px"
-                    duration={1500}
+                    duration={1000}
+                    easing="easeInQuad"
                 >
                     <h1>React Card Expansion</h1>
                     <div className="child">
@@ -31,6 +33,33 @@ export default class App extends Component {
                     id est laborum.
                     
                     </div>
+                    <div className="child">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis n
+                    ostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
+                    irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim 
+                    id est laborum.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis n
+                    ostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
+                    irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim 
+                    id est laborum.
+                    
+                    </div>
+                </CircularClip>
+                <CircularClip 
+                    className="lol"
+                    headerImage="http://i.imgur.com/J5wR1pO.jpg"
+                    headerColor="#000"
+                    contentColor="#2a2b2b"
+                    width="250px"
+                    height="250px"
+                    duration={1000}
+                    easing="easeInQuad"
+                >
+                    <h1>React Card Expansion</h1>
                     <div className="child">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
                     incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis n
