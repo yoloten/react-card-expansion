@@ -42,8 +42,8 @@ namespace Circular {
         contentHeight: number
         fullScreen: number
         cardWidth: number
-        click: number
         reverse: number
+        click: number
         toX: number
         x: number
         y: number
@@ -120,17 +120,17 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         let newY
 
         if (start < end) {
-            radious = (end - start) //+ 50 
-                
+            radious = (end - start)
+
         } else {
-            radious = -(start - end) 
+            radious = -(start - end)
         }
         if (click < 1) {
-            newX = radious * (lerp(1, 0, ease))
-            newY = Math.sin(lerp(100, 0, ease) / 20) * y + 30
+            newX = radious * (lerp(1.1, 0, ease))
+            newY = Math.sin(lerp(110, 0, ease) / 20) * y + 30
         } else {
-            newX = radious * (lerp(0, 1, ease ))
-            newY = Math.sin(lerp(0, 100, ease) / 20)  * y   //- (y / 1.82)
+            newX = radious * (lerp(-0.1, 1, ease))
+            newY = Math.sin(lerp(-10.1, 100, ease) / 20) * y
         }
 
         return { x: newX, y: newY }
@@ -175,7 +175,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     height: 501,
                     width: window.innerWidth * 0.994,
                     scaleX: 1,
-                    x: -Math.round(xNow - 250 / 3.35),
+                    x: -(xNow - 248 / 3.35),
                     y: y < 40 ? -y : -yNow - 1,
                 },
                 duration: 550,
@@ -268,23 +268,16 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const { click, x, y, toX, reverse } = this.state
         const { duration } = this.props
 
-        start === 0
-            ? start = performance.now()
-            : ""
+        if (start === 0) {
+            start = performance.now()
+        }
 
-        let elapsed = performance.now() - start
+        const elapsed = performance.now() - start
 
         const xNow = this.Circular.getBoundingClientRect().x
         const yNow = Math.floor(this.Circular.getBoundingClientRect().y * 0.3)
 
         const easing = EasingFunctions[this.props.easing]
-        let makeFaster
-        
-        if (x < toX ) {
-            makeFaster = (xNow - x) <= 100 ? 7 : 1 
-        } else {
-            makeFaster = (xNow - x) >= 50 ? 7 : 1 
-        }
 
         if (click < 1) {
             if (xNow === x) {
@@ -306,28 +299,28 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 this.backToCircular(circular, animateContent, toX)
                 this.setState({ reverse: 1 })
             }
-             
-            console.log( xNow - x, makeFaster, xNow - 75)
-            this.Circular.style.left = this.path(x, toX, easing(duration / ((elapsed * makeFaster) + duration))).x
-            this.Circular.style.top = this.path(0, y, easing(duration / ((elapsed * makeFaster) + duration))).y
+
+            //console.log(xNow - x,  xNow - 75)
+            this.Circular.style.left = this.path(x, toX, easing(duration / (elapsed + duration))).x
+            this.Circular.style.top = this.path(0, y, easing(duration / (elapsed + duration))).y
 
             id = window.requestAnimationFrame(this.onStart)
 
-            if (Math.floor(xNow - 75) === Math.floor(x + 1) 
-                    || Math.round(xNow - 75) === Math.round(x + 1)
-                    || Math.round(xNow - 75) === Math.round(x - 1)
-                    || Math.round(xNow - 75) === Math.round(x - 1)
+            if (Math.floor(xNow - 75) === Math.floor(x + 1)
+                || Math.round(xNow - 75) === Math.round(x + 1)
+                || Math.round(xNow - 75) === Math.round(x - 1)
+                || Math.round(xNow - 75) === Math.round(x - 1)
             ) {
                 cancelAnimationFrame(id)
                 this.backToInitial(circular)
                 this.setState({ click: 0, reverse: 0 })
                 start = 0
             }
-
         }
     }
 
     public render() {
+
         return (
             <Main
                 ref={(node: any) => this.Main = node}
