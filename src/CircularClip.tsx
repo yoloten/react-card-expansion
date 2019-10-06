@@ -160,7 +160,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
 
     public expansion = (circular: any, animateContent: any, xNow: number, yNow: number) => {
         const { y, x } = this.state
-        console.log(-Math.round(xNow) + Math.round(xNow / 10), window.innerWidth)
+     
         setTimeout(() => {
             tween({
                 from: {
