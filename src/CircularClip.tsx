@@ -41,6 +41,7 @@ namespace Circular {
     export interface State {
         contentHeight: number
         fullScreen: number
+        cardHeight: number
         cardWidth: number
         reverse: number
         click: number
@@ -92,6 +93,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     public state: Circular.State = {
         contentHeight: 0,
         fullScreen: 0,
+        cardHeight: 0,
         cardWidth: 0,
         click: 0,
         reverse: 0,
@@ -106,6 +108,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const translateToX = (window.innerWidth - this.Circular.getBoundingClientRect().width) / 2
 
         this.setState({
+            cardHeight: this.Circular.getBoundingClientRect().height,
             cardWidth: this.Circular.getBoundingClientRect().width,
             toX: translateToX,
             x,
@@ -157,9 +160,8 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     }
 
     public expansion = (circular: any, animateContent: any, xNow: number, yNow: number) => {
-        const { width } = this.props
-        const { cardWidth, y } = this.state
-        // console.log(xNow)
+        const { y } = this.state
+    
         setTimeout(() => {
             tween({
                 from: {
@@ -174,8 +176,8 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     borderRadius: 0,
                     height: 501,
                     width: window.innerWidth * 0.994,
-                    scaleX: 1,
-                    x: -(xNow - 248 / 3.35),
+                    scale: 1,
+                    x: -(xNow - 250 / 3.4),
                     y: y < 40 ? -y : -yNow - 1,
                 },
                 duration: 550,
@@ -204,8 +206,6 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     }
 
     public backToCircular = (circular: any, animateContent: any, toX: number) => {
-        const { width } = this.props
-
         tween({
             from: {
                 y: 500,
@@ -243,6 +243,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     }
 
     public backToInitial = (circular: any) => {
+        const { cardWidth, cardHeight } = this.state
         tween({
             from: {
                 borderRadius: 200,
@@ -252,8 +253,8 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             },
             to: {
                 borderRadius: 0,
-                height: this.props.height,
-                width: this.props.width,
+                height: cardHeight,
+                width: cardWidth,
                 scale: 1,
             },
             duration: 700

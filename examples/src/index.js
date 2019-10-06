@@ -12,7 +12,7 @@ export default class App extends Component {
                     headerImage="http://i.imgur.com/J5wR1pO.jpg"
                     headerColor="#000"
                     contentColor="#2a2b2b"
-                    width="250px"
+                    width="350px"
                     height="250px"
                     duration={1000}
                     easing="easeInQuad"
@@ -54,7 +54,7 @@ export default class App extends Component {
                     headerImage="http://i.imgur.com/J5wR1pO.jpg"
                     headerColor="#000"
                     contentColor="#2a2b2b"
-                    width="250px"
+                    width="350px"
                     height="250px"
                     duration={1000}
                     easing="easeInQuad"
