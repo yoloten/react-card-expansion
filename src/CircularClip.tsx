@@ -50,7 +50,6 @@ namespace Circular {
         y: number
     }
 }
-// height:  ${Style.contentHeight};
 
 const Card = styled.div`
     background: ${Style.headerBgColor};
@@ -116,17 +115,17 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         })
     }
 
-    public path = (start, end, ease) => {
+    public path = (begin: number, end: number, ease: number) => {
         const { y, click } = this.state
         let radious
         let newX
         let newY
 
-        if (start < end) {
-            radious = (end - start)
+        if (begin < end) {
+            radious = (end - begin)
 
         } else {
-            radious = -(start - end)
+            radious = -(begin - end)
         }
         if (click < 1) {
             newX = radious * (lerp(1.1, 0, ease))
@@ -160,8 +159,8 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
     }
 
     public expansion = (circular: any, animateContent: any, xNow: number, yNow: number) => {
-        const { y } = this.state
-    
+        const { y, x } = this.state
+        console.log(-Math.round(xNow) + Math.round(xNow / 10), window.innerWidth)
         setTimeout(() => {
             tween({
                 from: {
@@ -177,7 +176,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     height: 501,
                     width: window.innerWidth * 0.994,
                     scale: 1,
-                    x: -(xNow - 250 / 3.4),
+                    x: -Math.round(xNow - 250 / 3.4),
                     y: y < 40 ? -y : -yNow - 1,
                 },
                 duration: 550,
@@ -200,7 +199,7 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 duration: 300,
             })
                 .start(animateContent.set)
-
+ 
             this.setState({ contentHeight: 1, click: 1 })
         }, 700)
     }
@@ -301,7 +300,6 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                 this.setState({ reverse: 1 })
             }
 
-            //console.log(xNow - x,  xNow - 75)
             this.Circular.style.left = this.path(x, toX, easing(duration / (elapsed + duration))).x
             this.Circular.style.top = this.path(0, y, easing(duration / (elapsed + duration))).y
 
@@ -309,7 +307,6 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
 
             if (Math.floor(xNow - 75) === Math.floor(x + 1)
                 || Math.round(xNow - 75) === Math.round(x + 1)
-                || Math.round(xNow - 75) === Math.round(x - 1)
                 || Math.round(xNow - 75) === Math.round(x - 1)
             ) {
                 cancelAnimationFrame(id)
