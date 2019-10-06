@@ -76,6 +76,23 @@ class Example extends React.Component {
 - `headerColor` - color to set on the background of card(strings)
 - `height` - height of the card (string)
 - `width` - width of the card (string)
+- `easing` - easing function(string)
+
+## List of available easing functions
+
+- `linear`
+- `easeInQuad`
+- `easeOutQuad`
+- `easeInOutQuad`
+- `easeInCubic`
+- `easeOutCubic`
+- `easeInOutCubic`
+- `easeInQuart`
+- `easeOutQuart`
+- `easeInOutQuart`
+- `easeInQuint`
+- `easeOutQuint`
+- `easeInOutQuint`
 
 ## License
 MIT Licensed. Copyright (c) 2019 yoloten
