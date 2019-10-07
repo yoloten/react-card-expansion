@@ -131,8 +131,8 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             newX = radious * (lerp(1.1, 0, ease))
             newY = Math.sin(lerp(110, 0, ease) / 20) * y + 30
         } else {
-            newX = radious * (lerp(-0.2, 0.9, ease))
-            newY = Math.sin(lerp(-24.2, 110, ease) / 20) * y 
+            newX = radious * (lerp(-0.1, 0.9, ease))
+            newY = Math.sin(lerp(-10.1, 110, ease) / 20) * y 
         }
 
         return { x: newX, y: newY }
@@ -272,24 +272,25 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             start = performance.now()
         }
 
-        const elapsed = performance.now() - start - 500
+        const elapsed = performance.now() - start - 350
 
         const xNow = this.Circular.getBoundingClientRect().x
         const yNow = Math.floor(this.Circular.getBoundingClientRect().y * 0.3)
 
         const easing = EasingFunctions[this.props.easing]
-
+ 
         if (click < 1) {
             if (elapsed < 0) {
-                if ( xNow === x) {
+                if ( Math.round(xNow) <= x || Math.floor(xNow) <= x ) {
                     this.initialCircular(circular)
+                    //console.log(elapsed)
                 }
             } else {
                 this.Circular.style.left = this.path(x, toX, easing(duration / (elapsed + duration))).x
                 this.Circular.style.top = this.path(0, y, easing(duration / (elapsed + duration))).y
             }  
             id = window.requestAnimationFrame(this.onStart)
-            
+            console.log(xNow, x)
             if (yNow === 31) {
                 cancelAnimationFrame(id)
                 this.expansion(circular, animateContent, xNow, yNow)
@@ -308,8 +309,8 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
             }
             
             id = window.requestAnimationFrame(this.onStart)
-
-            if (Math.floor(xNow - 75) === Math.floor(x + 1)
+            console.log(Math.round(xNow - 75), x)
+            if (Math.round(xNow - 75) === Math.round(x)
                 || Math.round(xNow - 75) === Math.round(x + 1)
                 || Math.round(xNow - 75) === Math.round(x - 1)
             ) {
