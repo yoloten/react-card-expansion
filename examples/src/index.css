@@ -1,20 +1,107 @@
 body{
-    margin: 0
+    margin: 0;
+    font-family: 'Actor', sans-serif;
 }
 
-/* .main{
+.main{
     display: flex;
-    justify-content: space-around;
-} */
-
-.circ{
-    margin-top: 100px;
-    margin-left: 30px;
+    flex-direction: column;
 }
 
-.lol{
-    margin-top: 100px;
-    margin-left: 1204px;
+.headerText{
+    align-self: center;
+}
+
+h1{
+    font-weight: 300;
+}
+
+.headerH1{
+    font-size: 28px;
+    margin-top: 80px;
+    margin-bottom: -8px;
+}
+
+.headerH2{
+    font-size: 18px;
+    margin-bottom: -8px;
+    text-align: center;
+    color: #8C8C8C;
+    font-weight: 300;
+}
+
+.cards{
+    margin-left: 200px;
+    margin-right: 200px;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.properties{
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    line-height: 15px;
+}
+
+span{
+    color: #8C8C8C;
+}
+
+.install{
+    margin-left: 200px;
+    margin-top: 40px;
+}
+
+.npm{
+    font-family: 'Roboto', sans-serif;
+    background: #141414ea;
+    color: #fff;
+    width: 350px;
+    height: 90px;
+    padding-left: 10px;
+    border-radius: 3px;
+    line-height: 10px
+}
+.npmP{
+    padding-top: 10px
+}
+
+.footer{
+    clip-path: polygon(100% 6%, 0 100%, 100% 100%);
+    background: #141414ea; 
+    width: 450px;
+    height: 280px;
+    margin: -150 0 0 1;
+    align-self: flex-end;
+    color: rgb(255, 255, 255);
+    margin-bottom: 100px;
+}
+
+.powered{
+    font-size: 18px;
+    margin-top: 200px;
+    margin-left: 200px;
+}
+
+.link{
+    margin-left: 245px;
+    display: flex;
+}
+
+.footerA{
+    margin-left: 10px;
+    margin-top: -5px;
+    text-decoration: none;
+    font-size: 18px;
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+
+.git{
+    height: 32px;
+    margin-top: -10px;
 }
 
 .child{
@@ -28,9 +115,32 @@ body{
     line-height: 1.5
 }
 
-h1{
-    text-align: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: normal;
-    color: rgb(197, 197, 197);
-}
+@media screen and (max-width: 1440px) and (max-height: 900px){
+    .cards{
+        margin-left: 120px;
+        margin-right: 120px;
+        margin-top: 60px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .install{
+        margin-left: 120px;
+        margin-top: 40px;
+    }
+} 
+
+@media screen and (min-width: 1280px) and (min-height: 800px){
+    .cards{
+        margin-left: 100px;
+        margin-right: 100px;
+        margin-top: 60px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .install{
+        margin-left: 100px;
+        margin-top: 40px;
+    }
+} 
