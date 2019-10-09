@@ -1,0 +1,42 @@
+{
+  "name": "react-card-expansion",
+  "version": "1.0.0",
+  "description": "Unique card animation for react. Inspired by tympanus.net.  See the demo https://yoloten.github.io/react-card-expansion/",
+  "main": "./lib/index.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
+  },
+  "scripts": {
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf ./lib && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yoloten/react-card-expansion.git"
+  },
+  "author": "Rustam Sahatov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yoloten/react-card-expansion/issues"
+  },
+  "homepage": "https://github.com/yoloten/react-card-expansion#readme",
+  "dependencies": {
+    "popmotion": "^8.7.0",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "styled-components": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.5",
+    "@types/react-dom": "^16.9.1",
+    "@types/styled-components": "^4.1.19",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "tslint": "^5.20.0",
+    "tslint-react": "^4.1.0",
+    "typescript": "^3.6.3"
+  }
+}

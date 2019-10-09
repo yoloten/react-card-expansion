@@ -1,6 +1,7 @@
 import { tween, styler, chain, delay } from "popmotion"
 import styled from "styled-components"
 import * as React from "react"
+import * as ReactDOM from "react-dom"
 import EasingFunctions from "./easings"
 import lerp from "./lerp"
 
@@ -110,9 +111,23 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
         const y = this.Circular.getBoundingClientRect().top
         const translateToX = (window.innerWidth - this.Circular.getBoundingClientRect().width) / 2
 
+        window.addEventListener('scroll', this.handleOnScroll)
+       // console.log(ReactDOM.findDOMNode(this).parentNode.getBoundingClientRect())
         this.setState({
             cardHeight: this.Circular.getBoundingClientRect().height,
             cardWidth: this.Circular.getBoundingClientRect().width,
+            toX: translateToX,
+            x,
+            y,
+        })
+    }
+
+    public handleOnScroll = () => {
+        const x = this.Circular.getBoundingClientRect().left
+        const y = this.Circular.getBoundingClientRect().top
+        const translateToX = (window.innerWidth - this.Circular.getBoundingClientRect().width) / 2
+
+        this.setState({
             toX: translateToX,
             x,
             y,
@@ -290,11 +305,17 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     //console.log(elapsed)
                 }
             } else {
-                this.Circular.style.left = this.path(x, toX, easing(duration / (elapsed + duration))).x
-                this.Circular.style.top = this.path(0, y, easing(duration / (elapsed + duration))).y
+                if(Math.floor(x / 100), Math.floor(toX / 100)){
+                    //console.log("lol")
+                    this.Circular.style.left = this.path(x, toX + 100, easing(duration / ((elapsed * 2) + duration))).x
+                    this.Circular.style.top = this.path(0, y, easing(duration / ((elapsed * 2) + duration))).y
+                } else{
+                    this.Circular.style.left = this.path(x, toX, easing(duration / ((elapsed * 2) + duration))).x
+                    this.Circular.style.top = this.path(0, y, easing(duration / ((elapsed * 2) + duration))).y
+                }
             }  
             id = window.requestAnimationFrame(this.onStart)
-            console.log(xNow, x)
+           
             if (yNow === 31) {
                 cancelAnimationFrame(id)
                 this.setState({position: "fixed"})
@@ -310,16 +331,23 @@ export class CircularClip extends React.Component<Circular.Props, Circular.State
                     this.setState({ reverse: 1 })
                 }
             } else {
-                this.Circular.style.left = this.path(x, toX, easing(duration / (elapsed + duration))).x
-                this.Circular.style.top = this.path(0, y, easing(duration / (elapsed + duration))).y
+                if (Math.floor(x / 100), Math.floor(toX / 100)){
+                    this.Circular.style.left = this.path(x, toX + 100, easing(duration / ((elapsed * 2) + duration))).x
+                    this.Circular.style.top = this.path(0, y, easing(duration / ((elapsed * 2) + duration))).y
+                } else {
+                    this.Circular.style.left = this.path(x, toX, easing(duration / ((elapsed * 2) + duration))).x
+                    this.Circular.style.top = this.path(0, y, easing(duration / ((elapsed * 2) + duration))).y
+                }
             }
             
             id = window.requestAnimationFrame(this.onStart)
-            console.log(Math.round(xNow - 75), x)
+            console.log(x, toX)
+            
             if (Math.round(xNow - 75) === Math.round(x)
                 || Math.round(xNow - 75) === Math.round(x + 1)
                 || Math.round(xNow - 75) === Math.round(x - 1)
             ) {
+                console.log(Math.round(xNow - 75), Math.round(x))
                 cancelAnimationFrame(id)
                 this.backToInitial(circular)
                 this.setState({ click: 0, reverse: 0 })
